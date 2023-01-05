@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  mongodb:
+    image: 'mongo'
+    volumes:
+      - data:/data/db
+    # environment: you can specify the env varibale like this or give a file to it.
+    #   MONGO_INITDB_ROOT_PASSWORD:secret
+    #   MONGO_INITDB_ROOT_USERNAME:mori
+    env_file:
+      - ./environment/mongo.env
+  backend:
+    build:
+      context: "./backend"
+      # dockerfile: Dockerfile    you can  build the image in two ways.
+    ports:
+      - '80:80'
+    volumes:
+      - logs:/app/logs
+      - /app/node_modules
+      - ./backend:/app
+    env_file:
+      - ./environment/backend.env
+    depends_on:
+      - mongodb
+    
+  frontend:
+    build: 
+      context: "./frontend"
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend/src:/app/src
+    stdin_open: true
+    tty: true
+ 
+volumes:
+  data:
+  logs:
